@@ -4,12 +4,13 @@
     "type": "library",
     "require": {
 	"php": ">=5.4",
-        "yiisoft/yii2-debug":"^2.1.19" 
+        "yiisoft/yii2-debug":"^2.1.19",
+        "yiisoft/yii2-mongodb": "^3.0" 
     },
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Yagas\\Yii2Debug4mongo\\": "src/"
+            "yagas\\debug\\": "src/"
         }
     },
     "authors": [
