@@ -3,7 +3,7 @@
     "description": "Yii2 Debug for MongoDB",
     "type": "library",
     "require": {
-	"php": ">=5.4",
+	    "php": ">=5.4",
         "yiisoft/yii2-debug":"^2.1.19",
         "yiisoft/yii2-mongodb": "^3.0" 
     },
