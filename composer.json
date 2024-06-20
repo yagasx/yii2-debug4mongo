@@ -1,0 +1,33 @@
+{
+    "name": "yagas/yii2-debug4mongo",
+    "description": "Yii2 Debug for MongoDB",
+    "type": "library",
+    "require": {
+	"php": ">=5.4",
+        "yiisoft/yii2-debug":"^2.1.19" 
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Yagas\\Yii2Debug4mongo\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "yagas",
+            "email": "yagas@sina.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://asset-packagist.cn"
+        }
+    ],
+    "config": {
+        "allow-plugins": {
+            "yiisoft/yii2-composer": true
+        }
+    }
+}
