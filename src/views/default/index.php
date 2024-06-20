@@ -1,6 +1,5 @@
 <?php
 
-use yii\data\ArrayDataProvider;
 use yii\grid\GridView;
 use yii\helpers\Html;
 use yii\helpers\Url;
@@ -69,6 +68,11 @@ $this->title = 'Yii Debugger';
                 ],
                 'columns' => array_filter([
                     ['class' => 'yii\grid\SerialColumn'],
+                    [
+                        'attribute' => 'app_no',
+                        'label' => 'Application',
+                        'format' => 'raw'
+                    ],
                     [
                         'attribute' => 'tag',
                         'value' => function ($data) {

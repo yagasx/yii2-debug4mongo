@@ -8,14 +8,15 @@
 
 namespace yagas\debug;
 
-use yagas\debug\models\DbDebug;
 use Yii;
-use yii\base\ErrorException;
 use yii\helpers\FileHelper;
+use yii\base\ErrorException;
+use yii\helpers\ArrayHelper;
+use yagas\debug\models\DbDebug;
 use yii\debug\FlattenException;
 use yii\data\ActiveDataProvider;
+use yii\web\NotFoundHttpException;
 use yii\debug\LogTarget as OriginLogTarget;
-use yii\helpers\ArrayHelper;
 
 /**
  * The debug LogTarget is used to store logs for later use in the debugger tool
@@ -34,8 +35,6 @@ class LogTarget extends OriginLogTarget
      */
     public function export()
     {
-        var_dump($this->app_no);
-        exit;
         $path = $this->module->dataPath;
         FileHelper::createDirectory($path, $this->module->dirMode);
 
@@ -77,8 +76,8 @@ class LogTarget extends OriginLogTarget
         $page = ArrayHelper::getValue($_GET, 'page', '1');
         $pageSize = ArrayHelper::getValue($_GET, 'per-page', '50');
         $dataProvider = new ActiveDataProvider([
-            'query' => DbDebug::find()->select(['_id', 'summary'])->asArray(),
-            'pagination' => ['page' => $page, 'pageSize' => $pageSize],
+            'query' => DbDebug::find()->select(['_id', 'app_no', 'summary'])->asArray(),
+            'pagination' => ['page' => ($page - 1), 'pageSize' => $pageSize],
             'sort' => ['defaultOrder' => ['datetime' => SORT_DESC]]
         ]);
 
@@ -89,8 +88,37 @@ class LogTarget extends OriginLogTarget
     {
         $data = [];
         foreach ($models as $item) {
-            $data[] = $item['summary'];
+            $row = $item['summary'];
+            $row['app_no'] = $item['app_no'];
+            $data[] = $row;
         }
+        return array_column($data, null, 'tag');
+    }
+
+    /**
+     * @see DefaultController
+     * @return array
+     */
+    public function loadTagToPanels($tag)
+    {
+        $record = DbDebug::find()->where(['summary.tag' => $tag])->one();
+        if (!$record) {
+            throw new NotFoundHttpException("Unable to find debug data tagged with '$tag'.");
+        }
+        $data = $record['data'];
+        $exceptions = $data['exceptions'];
+        foreach ($this->module->panels as $id => $panel) {
+            if (isset($data[$id])) {
+                $panel->tag = $tag;
+                $panel->load(unserialize($data[$id]));
+            } else {
+                unset($this->module->panels[$id]);
+            }
+            if (isset($exceptions[$id])) {
+                $panel->setError($exceptions[$id]);
+            }
+        }
+
         return $data;
     }
 }
