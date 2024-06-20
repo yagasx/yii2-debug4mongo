@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @link https://www.yiiframework.com/
  * @copyright Copyright (c) 2008 Yii Software LLC
@@ -33,6 +34,8 @@ class LogTarget extends OriginLogTarget
      */
     public function export()
     {
+        var_dump($this->app_no);
+        exit;
         $path = $this->module->dataPath;
         FileHelper::createDirectory($path, $this->module->dirMode);
 
@@ -75,8 +78,8 @@ class LogTarget extends OriginLogTarget
         $pageSize = ArrayHelper::getValue($_GET, 'per-page', '50');
         $dataProvider = new ActiveDataProvider([
             'query' => DbDebug::find()->select(['_id', 'summary'])->asArray(),
-            'pagination' => [ 'page' => $page, 'pageSize' => $pageSize],
-            'sort' => ['orderDefault' => ['datetime' => SORT_DESC]]
+            'pagination' => ['page' => $page, 'pageSize' => $pageSize],
+            'sort' => ['defaultOrder' => ['datetime' => SORT_DESC]]
         ]);
 
         return $this->afterLoadManifest($dataProvider->getModels());
@@ -85,7 +88,7 @@ class LogTarget extends OriginLogTarget
     public function afterLoadManifest($models)
     {
         $data = [];
-        foreach($models as $item) {
+        foreach ($models as $item) {
             $data[] = $item['summary'];
         }
         return $data;
