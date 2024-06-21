@@ -17,13 +17,13 @@ class DbDebug extends ActiveRecord
 {
     public function attributes()
     {
-        return ['_id', 'app_no', 'method', 'ip', 'url', 'tag', 'ajax', 'time', 'statusCode', 'sqlCount', 'mailCount', 'processingTime', 'peakMemory', 'data'];
+        return ['_id', 'app_no', 'method', 'ip', 'url', 'tag', 'ajax', 'time', 'statusCode', 'sqlCount', 'mailCount', 'mailFiles', 'processingTime', 'peakMemory', 'data'];
     }
 
     public function rules()
     {
         return [
-            [['app_no', 'method', 'ip', 'url', 'tag', 'ajax', 'time', 'statusCode', 'sqlCount', 'mailCount', 'processingTime', 'peakMemory', 'data'], 'safe']
+            [['app_no', 'method', 'ip', 'url', 'tag', 'ajax', 'time', 'statusCode', 'sqlCount', 'mailCount', 'mailFiles', 'processingTime', 'peakMemory', 'data'], 'safe']
         ];
     }
 }
