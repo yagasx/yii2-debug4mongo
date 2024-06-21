@@ -11,21 +11,19 @@ use yii\mongodb\ActiveRecord;
  * @date 2024-06-20
  * 
  * @property string $app_no 节点名称
- * @property array $summary 摘要信息
  * @property array $data 请求数据
  */
 class DbDebug extends ActiveRecord
 {
     public function attributes()
     {
-        return ['_id', 'app_no', 'summary', 'data', 'datetime'];
+        return ['_id', 'app_no', 'method', 'ip', 'url', 'tag', 'ajax', 'time', 'statusCode', 'sqlCount', 'mailCount', 'processingTime', 'peakMemory', 'data'];
     }
 
     public function rules()
     {
         return [
-            ['datetime', 'default', 'value' => time()],
-            [['app_no', 'summary', 'data'], 'safe']
+            [['app_no', 'method', 'ip', 'url', 'tag', 'ajax', 'time', 'statusCode', 'sqlCount', 'mailCount', 'processingTime', 'peakMemory', 'data'], 'safe']
         ];
     }
 }

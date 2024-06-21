@@ -8,6 +8,7 @@
 
 namespace yagas\debug;
 
+use yagas\debug\models\search\Debug;
 use Yii;
 use yii\helpers\FileHelper;
 use yii\base\ErrorException;
@@ -58,7 +59,7 @@ class LogTarget extends OriginLogTarget
 
         $dbDebug = new DbDebug();
         $dbDebug->app_no = $this->app_no;
-        $dbDebug->summary = $summary;
+        $dbDebug->setAttributes($summary);
         $dbDebug->data = $data;
 
         if (!$dbDebug->save()) {
@@ -73,26 +74,9 @@ class LogTarget extends OriginLogTarget
      */
     public function loadManifest()
     {
-        $page = ArrayHelper::getValue($_GET, 'page', '1');
-        $pageSize = ArrayHelper::getValue($_GET, 'per-page', '50');
-        $dataProvider = new ActiveDataProvider([
-            'query' => DbDebug::find()->select(['_id', 'app_no', 'summary'])->asArray(),
-            'pagination' => ['page' => ($page - 1), 'pageSize' => $pageSize],
-            'sort' => ['defaultOrder' => ['datetime' => SORT_DESC]]
-        ]);
-
-        return $this->afterLoadManifest($dataProvider->getModels());
-    }
-
-    public function afterLoadManifest($models)
-    {
-        $data = [];
-        foreach ($models as $item) {
-            $row = $item['summary'];
-            $row['app_no'] = $item['app_no'];
-            $data[] = $row;
-        }
-        return array_column($data, null, 'tag');
+        $debug = new Debug();
+        $dataProvider = $debug->search($_GET);
+        return $dataProvider->getModels();
     }
 
     /**
@@ -101,7 +85,7 @@ class LogTarget extends OriginLogTarget
      */
     public function loadTagToPanels($tag)
     {
-        $record = DbDebug::find()->where(['summary.tag' => $tag])->one();
+        $record = DbDebug::find()->where(['tag' => $tag])->one();
         if (!$record) {
             throw new NotFoundHttpException("Unable to find debug data tagged with '$tag'.");
         }

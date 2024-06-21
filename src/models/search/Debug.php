@@ -2,13 +2,18 @@
 
 namespace yagas\debug\models\search;
 
+use yagas\debug\models\DbDebug;
+use yii\data\ActiveDataProvider;
 use yii\data\ArrayDataProvider;
 use yii\debug\components\search\Filter;
 use yii\debug\models\search\Debug as OriginDebug;
+use yii\helpers\ArrayHelper;
 
 class Debug extends OriginDebug
 {
     public $app_no;
+    public $page = 1;
+    public $per_page = 50;
 
     /**
      * {@inheritdoc}
@@ -40,34 +45,51 @@ class Debug extends OriginDebug
         ];
     }
 
-    public function search($params, $models)
+    public function init()
     {
-        $dataProvider = new ArrayDataProvider([
-            'allModels' => $models,
+        $this->page = ArrayHelper::getValue($_GET, 'page', 1);
+        $this->per_page = ArrayHelper::getValue($_GET, 'per-page', 50);
+    }
+
+    public function search($params, $models=null)
+    {
+        $this->load($params);
+        $dataProvider = new ActiveDataProvider([
+            'query' => DbDebug::find()->filterWhere([
+                'method' => $this->method,
+                'ajax' => $this->ajax,
+                'statusCode' => $this->statusCode,
+                'sqlCount' => $this->sqlCount,
+                'mailCount' => $this->mailCount,
+            ])->andFilterWhere(['like', 'url', $this->url])
+                ->andFilterWhere(['like', 'tag', $this->tag])
+                ->select(['app_no','method', 'ip', 'tag', 'ajax', 'url', 'time', 'statusCode', 'sqlCount', 'mailCount', 'processingTime', 'peakMemory'])
+                ->asArray(),
             'sort' => [
-                'attributes' => ['app_no', 'method', 'ip', 'tag', 'time', 'statusCode', 'sqlCount', 'mailCount', 'processingTime', 'peakMemory'],
+                'defaultOrder' => ['time' => SORT_DESC],
+                'attributes' => ['method', 'ip', 'tag', 'time', 'statusCode', 'sqlCount', 'mailCount', 'processingTime', 'peakMemory'],
             ],
             'pagination' => [
-                'pageSize' => 50,
+                'page' => ($this->page-1),
+                'pageSize' => $this->per_page,
             ],
         ]);
 
-        if (!($this->load($params) && $this->validate())) {
+        if (!$this->validate()) {
             return $dataProvider;
         }
 
-        $filter = new Filter();
-        $this->addCondition($filter, 'app_no', true);
-        $this->addCondition($filter, 'tag', true);
-        $this->addCondition($filter, 'ip', true);
-        $this->addCondition($filter, 'method');
-        $this->addCondition($filter, 'ajax');
-        $this->addCondition($filter, 'url', true);
-        $this->addCondition($filter, 'statusCode');
-        $this->addCondition($filter, 'sqlCount');
-        $this->addCondition($filter, 'mailCount');
-        $dataProvider->allModels = $filter->filter($models);
-
         return $dataProvider;
+    }
+
+    public static function decode($models)
+    {
+        $data = [];
+        foreach ($models as $item) {
+            $row = $item['summary'];
+            $row['app_no'] = $item['app_no'];
+            $data[] = $row;
+        }
+        return array_column($data, null, 'tag');
     }
 }
