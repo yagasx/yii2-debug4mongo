@@ -10,6 +10,8 @@ class Module extends OriginModule
     
     public $logTarget = ['class' => 'yagas\debug\LogTarget', 'app_no' => 'service_001'];
 
+    public $percent = 10; // gc执行清除历史数据的几率（百分之）
+
     public function init()
     {
         \Yii::setAlias('@yagas/debug/controllers', __DIR__ . '/controllers');

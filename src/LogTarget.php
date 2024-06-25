@@ -66,6 +66,7 @@ class LogTarget extends OriginLogTarget
             $errors = $dbDebug->firstErrors;
             throw new ErrorException(current($errors));
         }
+        $this->mongo_gc(); // 执行清理历史记录
     }
 
     /**
@@ -104,5 +105,15 @@ class LogTarget extends OriginLogTarget
         }
 
         return $data;
+    }
+
+    protected function mongo_gc()
+    {
+        $random = mt_rand(1, 100);
+        if ($random <= $this->module->percent) {
+            $days = $this->module->historySize;
+            $datetime = strtotime("-{$days} day");
+            DbDebug::deleteAll(['<', 'time', $datetime]);
+        }
     }
 }

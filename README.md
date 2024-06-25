@@ -22,7 +22,7 @@
 
 - PHP支持>=5.4
 - yii2-mongodb
-- yii2-debug支持>=2.1.19
+- yii2-debug支持>=2.1.25(基于此版本构建而来)
 
 
 安装说明
@@ -40,8 +40,9 @@ if (YII_ENV_DEV) {
         'class' => 'yagas\debug\Module',
         'logTarget' => [
             'class' => 'yagas\debug\LogTarget',
-            'app_no' => 'localhost_001',
+            'app_no' => 'localhost_001', // 为当前站点设定标识
         ],
+        'percent' => 10, // 百分之十的几率清除历史数据(GC)
     ];
 }
 ```
